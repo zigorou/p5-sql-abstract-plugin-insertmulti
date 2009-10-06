@@ -1,0 +1,27 @@
+This is Perl module SQL::Abstract::Plugin::InsertMulti.
+
+INSTALLATION
+
+SQL::Abstract::Plugin::InsertMulti installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan SQL::Abstract::Plugin::InsertMulti
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+SQL::Abstract::Plugin::InsertMulti documentation is available as in POD. So you can do:
+
+    % perldoc SQL::Abstract::Plugin::InsertMulti
+
+to read the documentation online with your favorite pager.
+
+Toru Yamaguchi
