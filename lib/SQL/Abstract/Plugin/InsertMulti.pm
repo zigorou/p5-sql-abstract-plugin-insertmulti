@@ -3,7 +3,7 @@ package SQL::Abstract::Plugin::InsertMulti;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Sub::Exporter -setup => +{
     into    => 'SQL::Abstract',
@@ -72,7 +72,7 @@ sub _insert_multi_values {
 
     for my $d (@$data) {
         my @values;
-        for my $column ( sort keys %$d ) {
+        for my $column ( @{$opts->{fields}} ) {
             my $v = $d->{$column};
 
             $self->_SWITCH_refkind(

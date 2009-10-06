@@ -2,7 +2,7 @@ use strict;
 
 use Test::More;
 
-plan tests => 12;
+plan tests => 14;
 
 use SQL::Abstract;
 use SQL::Abstract::Plugin::InsertMulti;
@@ -10,6 +10,8 @@ use SQL::Abstract::Plugin::InsertMulti;
 can_ok('SQL::Abstract', qw/insert_multi update_multi/);
 my $sql = SQL::Abstract->new;
 isa_ok($sql, 'SQL::Abstract');
+
+diag("hashref list");
 
 {
     my $now = time;
@@ -162,4 +164,36 @@ isa_ok($sql, 'SQL::Abstract');
         1, 2, 'score', 200,
         1, 2, 'last_login', $now,
     ], 'update_multi bind test with update_ignore_fields option');
+}
+
+diag("arrayref list");
+
+{
+    my $now = time;
+    
+    my ($stmt, @bind) = $sql->insert_multi(
+        'app_data',
+        [qw/app_id guid name value created_on updated_on/],
+        [
+            [ 1, 1, 'score', 100, \'NOW()', \'NOW()', ],
+            [ 1, 1, 'last_login', \'UNIX_TIMESTAMP()', \'NOW()', \'NOW()', ],
+            [ 1, 2, 'score', 200, \'NOW()', \'NOW()', ],
+            [ 1, 2, 'last_login', $now, \'NOW()', \'NOW()',]
+        ],
+    );
+
+    note($stmt);
+    
+    is(
+        $stmt,
+        q|INSERT INTO app_data ( app_id, guid, name, value, created_on, updated_on ) |
+            . q|VALUES ( ?, ?, ?, ?, NOW(), NOW() ), ( ?, ?, ?, UNIX_TIMESTAMP(), NOW(), NOW() ), ( ?, ?, ?, ?, NOW(), NOW() ), ( ?, ?, ?, ?, NOW(), NOW() )|,
+        'insert_multi statement test'
+    );
+    is_deeply(\@bind, [
+        1, 1, 'score', 100,
+        1, 1, 'last_login', 
+        1, 2, 'score', 200,
+        1, 2, 'last_login', $now,
+    ], 'insert_multi bind test');
 }
