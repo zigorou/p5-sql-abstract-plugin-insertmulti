@@ -1,1 +1,0 @@
-lib/SQL/Abstract/Plugin/InsertMulti.pm
