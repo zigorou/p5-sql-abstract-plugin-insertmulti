@@ -2,13 +2,14 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use SQL::Abstract;
 use SQL::Abstract::Plugin::InsertMulti;
 
 my $sql = SQL::Abstract->new;
 
 subtest "insert_multi" => sub {
-    subtest "hashref list" => sub {
+    subtest "HASHREF list" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
 
@@ -37,7 +38,7 @@ subtest "insert_multi" => sub {
         ], 'insert_multi bind test');
     };
 
-    subtest "hashref list with ignore option" => sub {
+    subtest "HASHREF list with ignore option" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
     
@@ -66,7 +67,7 @@ subtest "insert_multi" => sub {
         ], 'insert_multi bind test with ignore option');
     };
 
-    subtest "arrayref list" => sub {
+    subtest "ARRAYREF list" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
     
@@ -95,10 +96,22 @@ subtest "insert_multi" => sub {
         ], 'insert_multi bind test');
     };
 
+    subtest "ARRAYREFREF will be thrown" => sub {
+        my $sql = SQL::Abstract->new;
+
+        dies_ok {
+            $sql->insert_multi(
+                "example",
+                [
+                    +{ foo => [qw/a b c/] }
+                ]
+            );
+        } "ARRAYREFREF";
+    };
 };
 
 subtest "update_multi" => sub {
-    subtest "hashref list" => sub {
+    subtest "HASHREF list" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
 
@@ -127,7 +140,7 @@ subtest "update_multi" => sub {
         ], 'update_multi bind test');
     };
 
-    subtest "hashref list with update option" => sub {
+    subtest "HASHREF list with update option" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
     
@@ -158,7 +171,7 @@ subtest "update_multi" => sub {
         ], 'insert_multi bind test with update option');
     };
 
-    subtest "hashref list with update_ignore_fields option" => sub {
+    subtest "HASHREF list with update_ignore_fields option" => sub {
         my $sql = SQL::Abstract->new;
         my $now = time;
     
@@ -186,6 +199,19 @@ subtest "update_multi" => sub {
             1, 2, 'score', 200,
             1, 2, 'last_login', $now,
         ], 'update_multi bind test with update_ignore_fields option');
+    };
+
+    subtest "ARRAYREFREF will be thrown" => sub {
+        my $sql = SQL::Abstract->new;
+
+        dies_ok {
+            $sql->update_multi(
+                "example",
+                [
+                    +{ foo => [qw/a b c/] }
+                ]
+            );
+        } "ARRAYREFREF";
     };
 };
 
