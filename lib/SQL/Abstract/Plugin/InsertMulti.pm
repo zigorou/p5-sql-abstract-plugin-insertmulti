@@ -3,8 +3,9 @@ package SQL::Abstract::Plugin::InsertMulti;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
+use Carp ();
 use Sub::Exporter -setup => +{
     into    => 'SQL::Abstract',
     exports => [
@@ -78,20 +79,6 @@ sub _insert_multi_values {
             $self->_SWITCH_refkind(
                 $v,
                 {
-                    ARRAYREF => sub {
-                        if ( $self->{array_datatypes} )
-                        {    # if array datatype are activated
-                            push @values, '?';
-                            push @all_bind, $self->_bindtype( $column, $v );
-                        }
-                        else {    # else literal SQL with bind
-                            my ( $sql, @bind ) = @$v;
-
-                            # $self->_assert_bindval_matches_bindtype(@bind);
-                            push @values,   $sql;
-                            push @all_bind, @bind;
-                        }
-                    },
                     ARRAYREFREF => sub {    # literal SQL with bind
                         my ( $sql, @bind ) = @${$v};
 
@@ -132,17 +119,6 @@ sub _insert_multi_values {
             $self->_SWITCH_refkind(
                 $v,
                 {
-                    ARRAYREF => sub {
-                        if ( $self->{array_datatypes} ) {    # array datatype
-                            push @set, "$label = ?";
-                            push @all_bind, $self->_bindtype( $k, $v );
-                        }
-                        else {    # literal SQL with bind
-                            my ( $sql, @bind ) = @$v;
-                            push @set,      "$label = $sql";
-                            push @all_bind, @bind;
-                        }
-                    },
                     ARRAYREFREF => sub {    # literal SQL with bind
                         my ( $sql, @bind ) = @${$v};
                         push @set,      "$label = $sql";
@@ -228,9 +204,11 @@ SQL::Abstract::Plugin::InsertMulti - add mysql bulk insert supports for SQL::Abs
 
 =head1 DESCRIPTION
 
-SQL::Abstract::Plugin::InsertMulti is bulk insert supports. Declare 'use SQL::Abstract::Plugin::InsertMulti;' with 'use SQL::Abstract;',
+SQL::Abstract::Plugin::InsertMulti is enable bulk insert support for L<SQL::Abstract>. Declare 'use SQL::Abstract::Plugin::InsertMulti;' with 'use SQL::Abstract;',
 exporting insert_multi() and update_multi() methods to L<SQL::Abstract> namespace from SQL::Abstract::Plugin::InsertMulti.
 Plugin system is depends on 'into' options of L<Sub::Exporter>.
+
+Notice: please check your mysql_allow_packet parameter using this module.
 
 =head1 METHODS
 
