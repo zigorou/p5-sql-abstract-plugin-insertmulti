@@ -1,7 +1,7 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "add mysql bulk insert supports for SQL::Abstract",
    "author" : [
-      "zigorou <zigorou@cpan.org>"
+      "Toru Yamaguchi <zigorou@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v0.3.2, CPAN::Meta::Converter version 2.130870",
@@ -42,15 +42,29 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008005"
+            "SQL::Abstract" : "1.6",
+            "Sub::Exporter" : "0",
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti/issues"
+      },
+      "homepage" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zigorou/p5-sql-abstract-plugin-insertmulti.git",
+         "web" : "https://github.com/zigorou/p5-sql-abstract-plugin-insertmulti"
+      }
+   },
+   "version" : "0.04"
 }

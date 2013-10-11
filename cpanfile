@@ -5,6 +5,6 @@ requires 'Sub::Exporter';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
-    required 'Test::Exception';
+    requires 'Test::Exception';
 };
 
