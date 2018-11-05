@@ -42,6 +42,12 @@ sub _insert_multi {
         $table, $sql,
     );
 
+    if ($opts->{returning}) {
+        my ($s, @b) = $self->_insert_returning($opts);
+        $sql .= $s;
+        push @bind, @b;
+    }
+
     return ( $sql, @bind );
 }
 
