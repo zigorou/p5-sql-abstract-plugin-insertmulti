@@ -1,6 +1,6 @@
 Revision history for Perl extension SQL::Abstract::Plugin::InsertMulti
 
-0.05
+{{$NEXT}}
         Mon Nov  5 15:35:23 JST 2018
         - Add support for SQL::Abstracts "returning" option for insert (by mschout)
 
