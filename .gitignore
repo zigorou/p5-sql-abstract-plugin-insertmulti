@@ -24,3 +24,9 @@ cover_db/
 MYMETA.*
 
 /SQL-Abstract-Plugin-InsertMulti-*
+/sql-abstract-plugin-insertmulti-*
+/.build
+/_build_params
+/Build.bat
+!Build/
+!META.json
