@@ -219,6 +219,37 @@ subtest "update_multi" => sub {
         ], 'update_multi bind test with update_ignore_fields option');
     };
 
+    subtest "HASHREF list with use_alias option" => sub {
+        my $sql = SQL::Abstract->new;
+        my $now = time;
+
+        my ($stmt, @bind) = $sql->update_multi(
+            'app_data',
+            [
+                +{ app_id => 1, guid => 1, name => 'score', value => 100, created_on => \'NOW()', updated_on => \'NOW()', },
+                +{ app_id => 1, guid => 1, name => 'last_login', value => \'UNIX_TIMESTAMP()', created_on => \'NOW()', updated_on => \'NOW()', },
+                +{ app_id => 1, guid => 2, name => 'score', value => 200, created_on => \'NOW()', updated_on => \'NOW()', },
+                +{ app_id => 1, guid => 2, name => 'last_login', value => $now, created_on => \'NOW()', updated_on => \'NOW()', }
+            ],
+            +{ use_alias => 1, }
+        );
+
+        is(
+            $stmt,
+            q|INSERT INTO app_data ( app_id, created_on, guid, name, updated_on, value ) |
+                . q|VALUES ( ?, NOW(), ?, ?, NOW(), ? ), ( ?, NOW(), ?, ?, NOW(), UNIX_TIMESTAMP() ), ( ?, NOW(), ?, ?, NOW(), ? ), ( ?, NOW(), ?, ?, NOW(), ? ) |
+                    . q|AS new |
+                    . q|ON DUPLICATE KEY UPDATE app_id = new.app_id, created_on = new.created_on, guid = new.guid, name = new.name, updated_on = new.updated_on, value = new.value|,
+            'update_multi statement test'
+        );
+        is_deeply(\@bind, [
+            1, 1, 'score', 100,
+            1, 1, 'last_login',
+            1, 2, 'score', 200,
+            1, 2, 'last_login', $now,
+        ], 'update_multi bind test with use_alias option');
+    };
+
     subtest "ARRAYREFREF will be thrown" => sub {
         my $sql = SQL::Abstract->new;
 
