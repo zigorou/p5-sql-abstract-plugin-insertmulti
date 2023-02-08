@@ -5,6 +5,8 @@ use warnings;
 
 our $VERSION = '0.05';
 
+my $alias = 'new';
+
 use Carp ();
 use Sub::Exporter -setup => +{
     into    => 'SQL::Abstract',
@@ -141,6 +143,9 @@ sub _insert_multi_values {
             );
         }
 
+        if ($opts->{use_alias}) {
+            $sql .= " " . $self->_sqlcase('as') . ' ' . $alias;
+        }
         $sql .=
           $self->_sqlcase(' on duplicate key update ') . join( ', ', @set );
     }
@@ -176,10 +181,10 @@ sub update_multi {
     if ($opts->{update_ignore_fields}) {
         @ignore{@{$opts->{update_ignore_fields}}} = map { 1 } @{$opts->{update_ignore_fields}};
     }
-    
+
     $opts->{update} = +{
         map {
-            my ( $k, $v ) = ( $_, $self->_sqlcase('values( ') . $_ . ' )' );
+            my ( $k, $v ) = ($opts->{use_alias}) ? ($_, "$alias.$_") : ( $_, $self->_sqlcase('values( ') . $_ . ' )' );
             ( $k, \$v );
         }
         grep { !exists $ignore{$_} }
@@ -250,6 +255,16 @@ given update_ignore_fields,
 
   my ($stmt, @bind) = $sql->update_multi('foo', [qw/a b c/], [ [ 1, 2, 3 ], [ 4, 5, 6 ] ], +{ update_ignore_fields => [qw/b c/], });
   # $stmt = q|INSERT INTO foo( a, b, c ) VALUES ( ?, ?, ? ), ( ?, ?, ? ) ON DUPLICATE KEY UPDATE a = VALUES( a )|
+  # @bind = (1, 2, 3, 4, 5, 6);
+
+=item use_alias
+
+Use an alias for rows in 'ON DUPLICATE KEY UPDATE' instead of VALUES() function.
+The use of VALUES() to refer to new rows and columns has been deprecated beginning with MySQL 8.0.20.
+On the other hand, an alias can be used since MySQL 8.0.19.
+
+  my ($stmt, @bind) = $sql->update_multi('foo', [qw/a b c/], [ [ 1, 2, 3 ], [ 4, 5, 6 ] ], +{ use_alias => 1 });
+  # $stmt = q|INSERT INTO foo( a, b, c ) VALUES ( ?, ?, ? ), ( ?, ?, ? ) AS new ON DUPLICATE KEY UPDATE a = new.a, b = new.b, c = new.c|
   # @bind = (1, 2, 3, 4, 5, 6);
 
 =back
